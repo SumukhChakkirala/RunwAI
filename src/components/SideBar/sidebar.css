@@ -54,7 +54,7 @@
 .bottom-item {
   padding: 10px;
   cursor: pointer;
-  display: flex; /* Ensure items are in a row */
+  display: flex; 
 }
 
 .sidebar .recent{
