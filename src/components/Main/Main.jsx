@@ -19,11 +19,11 @@ const Main = () => {
                     <img src={assets.compass_icon}/>
                 </div>
                 <div className="card">
-                    <p>What happened to the other twin in the Twin Towers?</p>
+                    <p>How long is the runway?</p>
                     <img src={assets.compass_icon}/>
                 </div>
                 <div className="card">
-                    <p>Are Muslims capable enough to fly planes?</p>
+                    <p>Sample Imagery</p>
                     <img src={assets.compass_icon}/>
                 </div>
                 <div className="card">
@@ -33,7 +33,7 @@ const Main = () => {
             </div>
             <div className="main-bottom">
                 <div className="search-box">
-                    <input type = 'text' placeholder='Paste your image and Query here'/>
+                    <input type = 'text' placeholder='Paste your image here'/>
                     <img src={assets.gallery_icon}alt="" />
                     <img src={assets.send_icon} alt="" />
                 </div>
