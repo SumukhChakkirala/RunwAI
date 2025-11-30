@@ -134,86 +134,6 @@
     color: #3c3200;
 }
 
-/* Sample Images List */
-.sample-images-list {
-    margin-bottom: 16px;
-}
-
-.sample-hint {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.sample-image-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    cursor: grab;
-    transition: all 0.2s ease;
-}
-
-.sample-image-card:hover {
-    border-color: #4285f4;
-    background: #f0f4ff;
-    transform: translateX(4px);
-}
-
-.sample-image-card:active {
-    cursor: grabbing;
-}
-
-.sample-image-card img {
-    width: 60px;
-    height: 40px;
-    object-fit: cover;
-    border-radius: 4px;
-}
-
-.sample-name {
-    font-size: 13px;
-    color: #333;
-    font-weight: 500;
-}
-
-/* Side Panel Actions */
-.side-panel-actions {
-    padding-top: 12px;
-    border-top: 1px solid #e0e0e0;
-}
-
-.upload-btn-side {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: #4285f4;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.upload-btn-side:hover {
-    background: #3367d6;
-}
-
-.upload-btn-side img {
-    width: 16px;
-    height: 16px;
-    filter: brightness(0) invert(1);
-}
-
 .main-container{
     max-width: 1100px;
     margin: 0 auto;
@@ -482,10 +402,10 @@
 }
 
 .main .card{
-    height: 160px;
+    height: 200px;
     padding: 15px;
     background-color: #f0f4f9;
-    border-radius: 10px;
+    border-radius: 12px;
     position: relative;
     cursor: pointer;
     overflow: hidden;
@@ -516,13 +436,9 @@
 
 /* Sample cards with thumbnail background */
 .main .card.sample-card {
-    cursor: grab;
+    cursor: pointer;
     justify-content: flex-end;
     align-items: flex-start;
-}
-
-.main .card.sample-card:active {
-    cursor: grabbing;
 }
 
 .main .card.sample-card .sample-thumbnail {

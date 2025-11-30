@@ -244,9 +244,13 @@ const Main = () => {
     setError(null)
   }
 
-  // Load sample image
+  // Load sample image - show preview immediately
   const loadSampleImage = async (sampleSrc) => {
     setError(null)
+    setResult(null)
+    // Show preview immediately
+    setPreviewUrl(sampleSrc)
+    
     try {
       const response = await fetch(sampleSrc)
       if (!response.ok) {
@@ -254,8 +258,9 @@ const Main = () => {
       }
       const blob = await response.blob()
       const file = new File([blob], 'sample.png', { type: 'image/png' })
-      handleFileSelect(file)
+      setSelectedImage(file)
     } catch (err) {
+      setPreviewUrl(null)
       setError({
         title: 'Failed to Load Sample',
         message: 'Could not load the sample image.',
@@ -293,15 +298,7 @@ const Main = () => {
   return (
     <div className='main' onPaste={handlePaste}>
         <div className="nav">
-            <p>RunwAI</p>
-            <div className="nav-right">
-              {serverStatus && (
-                <span className={`server-status ${serverStatus.model_loaded ? 'online' : 'offline'}`}>
-                  {serverStatus.model_loaded ? '● Online' : '● Offline'}
-                </span>
-              )}
-              <img src={assets.user_icon} alt="user_icon"/>
-            </div>
+            <p onClick={handleReset} style={{cursor: 'pointer'}}>RunwAI</p>
         </div>
         
         <div className="main-container">
