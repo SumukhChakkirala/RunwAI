@@ -11,11 +11,13 @@ import sys
 import traceback
 import urllib.request
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import torch
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from model import ResNetUNet, load_model
 from utils import (
@@ -110,16 +112,33 @@ app = FastAPI(
 # CORS configuration for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # Vite dev server
-        "http://localhost:3000",  # Alternative dev server
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=["*"],  # Allow all origins in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve React static files in production
+DIST_PATH = Path(__file__).parent.parent / "dist"
+PUBLIC_PATH = Path(__file__).parent.parent / "public"
+
+# Mount static assets
+if DIST_PATH.exists():
+    assets_path = DIST_PATH / "assets"
+    if assets_path.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_path)), name="assets")
+
+# Serve sample images from public folder
+if PUBLIC_PATH.exists():
+    for sample_file in PUBLIC_PATH.glob("sample*.png"):
+        sample_name = sample_file.name
+        sample_path = sample_file
+        
+        @app.get(f"/{sample_name}")
+        async def serve_sample(filepath: Path = sample_path):
+            if filepath.exists():
+                return FileResponse(filepath)
+            return {"error": "Sample image not found"}
 
 
 @app.get("/api/health")
@@ -280,7 +299,12 @@ async def segment_runway(file: UploadFile = File(...)):
 
 @app.get("/")
 async def root():
-    """Root endpoint with API information."""
+    """Serve React app or API info."""
+    index_path = DIST_PATH / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path)
+    
+    # Fallback to API info if React build not found
     return {
         "name": "RunwAI - Runway Segmentation API",
         "version": "1.0.0",
@@ -290,6 +314,28 @@ async def root():
             "GET /api/health": "Health check"
         }
     }
+
+
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    """Serve React SPA for all other routes."""
+    # Check if it's a sample image
+    if full_path.startswith("sample") and full_path.endswith(".png"):
+        sample_path = PUBLIC_PATH / full_path
+        if sample_path.exists():
+            return FileResponse(sample_path)
+    
+    # Check if file exists in dist
+    file_path = DIST_PATH / full_path
+    if file_path.exists() and file_path.is_file():
+        return FileResponse(file_path)
+    
+    # Fallback to index.html for React routing
+    index_path = DIST_PATH / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path)
+    
+    return {"error": "Not found", "path": full_path}
 
 
 if __name__ == "__main__":
