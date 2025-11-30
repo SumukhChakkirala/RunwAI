@@ -9,6 +9,7 @@ Endpoints:
 import os
 import sys
 import traceback
+import urllib.request
 from contextlib import asynccontextmanager
 
 import torch
@@ -33,8 +34,36 @@ model = None
 device = None
 model_load_error = None
 
-# Model path - adjust if needed
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "runway_0.9243.pth")
+# Model configuration - hosted on Hugging Face
+MODEL_URL = "https://huggingface.co/lazypanther/Runway-Segmentation/resolve/main/runway_0.9243.pth"
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "runway_0.9243.pth")
+
+
+def download_model():
+    """Download model from Hugging Face if not present locally."""
+    if os.path.exists(MODEL_PATH):
+        print(f"Model already exists at: {MODEL_PATH}")
+        return True
+    
+    print(f"Downloading model from: {MODEL_URL}")
+    try:
+        # Create a custom opener with proper headers
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-Agent', 'RunwAI/1.0')]
+        urllib.request.install_opener(opener)
+        
+        # Download with progress
+        def show_progress(block_num, block_size, total_size):
+            if total_size > 0:
+                percent = min(100, block_num * block_size * 100 / total_size)
+                print(f"\rDownloading: {percent:.1f}%", end="", flush=True)
+        
+        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH, reporthook=show_progress)
+        print("\nModel downloaded successfully!")
+        return True
+    except Exception as e:
+        print(f"\nFailed to download model: {e}")
+        return False
 
 
 @asynccontextmanager
@@ -46,8 +75,11 @@ async def lifespan(app: FastAPI):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
     
-    # Check if model file exists
-    if not os.path.exists(MODEL_PATH):
+    # Download model if needed
+    if not download_model():
+        model_load_error = f"Failed to download model from: {MODEL_URL}"
+        print(f"ERROR: {model_load_error}")
+    elif not os.path.exists(MODEL_PATH):
         model_load_error = f"Model file not found at: {MODEL_PATH}"
         print(f"ERROR: {model_load_error}")
     else:

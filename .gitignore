@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Model files (hosted externally on Hugging Face)
+*.pth
+__pycache__/
